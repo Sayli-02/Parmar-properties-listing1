@@ -1,0 +1,2 @@
+import { Link } from "@tanstack/react-router";
+export function Logo({compact=false}:{compact?:boolean}){return <Link to="/" aria-label="Parmar Properties home" className="group flex items-center gap-3"><span className="flex size-9 items-center justify-center border border-gold text-sm font-semibold text-gold">PP</span>{!compact&&<span className="leading-none"><span className="block font-display text-xl text-foreground">Parmar</span><span className="mt-1 block text-[.55rem] font-bold uppercase tracking-[.22em] text-muted-foreground">Properties</span></span>}</Link>}

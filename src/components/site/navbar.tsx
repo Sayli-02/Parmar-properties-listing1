@@ -1,0 +1,11 @@
+import { Link, useRouterState } from "@tanstack/react-router";
+import { Heart, Menu, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Logo } from "./logo";
+import { useSiteState } from "@/lib/site-state";
+const links=[{to:"/properties",label:"Properties"},{to:"/saved",label:"Saved"},{to:"/compare",label:"Compare"},{to:"/about",label:"About"},{to:"/contact",label:"Contact"}] as const;
+export function Navbar(){const [scrolled,setScrolled]=useState(false);const [open,setOpen]=useState(false);const path=useRouterState({select:s=>s.location.pathname});const {saved}=useSiteState();const overlay=path==="/"&&!scrolled;
+ useEffect(()=>{const f=()=>setScrolled(scrollY>36);f();addEventListener("scroll",f,{passive:true});return()=>removeEventListener("scroll",f)},[]);
+ useEffect(()=>setOpen(false),[path]);
+ return <header className={`fixed inset-x-0 top-0 z-40 border-b transition-all duration-200 ${overlay?"border-transparent bg-background/20 py-5":"border-border bg-background/95 py-3 backdrop-blur-md"}`}><div className="page-shell flex items-center justify-between"><Logo/><nav className="hidden items-center gap-8 lg:flex" aria-label="Main navigation">{links.map(l=><Link key={l.to} to={l.to} className="text-xs font-semibold uppercase tracking-[.12em] text-secondary-foreground transition-colors hover:text-gold" activeProps={{className:"text-gold"}}>{l.label}</Link>)}</nav><div className="flex items-center gap-2"><Button asChild size="sm" className="hidden lg:inline-flex"><Link to="/contact">Enquire</Link></Button><Button asChild variant="ghost" size="icon" className="relative lg:hidden"><Link to="/saved" aria-label={`${saved.length} saved properties`}><Heart/>{saved.length>0&&<span className="absolute right-0 top-0 size-4 rounded-full bg-primary text-[9px] leading-4 text-primary-foreground">{saved.length}</span>}</Link></Button><Button variant="ghost" size="icon" className="lg:hidden" aria-label={open?"Close menu":"Open menu"} onClick={()=>setOpen(v=>!v)}>{open?<X/>:<Menu/>}</Button></div></div>{open&&<nav className="page-shell mt-4 border-t border-border py-6 lg:hidden" aria-label="Mobile navigation">{links.map(l=><Link key={l.to} to={l.to} className="block border-b border-border py-4 font-display text-2xl text-foreground">{l.label}</Link>)}</nav>}</header>}
