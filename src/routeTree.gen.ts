@@ -11,10 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CompareRouteImport } from './routes/compare'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PropertiesRouteImport } from './routes/properties'
 import { Route as SavedRouteImport } from './routes/saved'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminSectionRouteImport } from './routes/admin.$section'
 import { Route as PropertiesSlugRouteImport } from './routes/properties.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -25,6 +28,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompareRoute = CompareRouteImport.update({
@@ -47,6 +55,16 @@ const SavedRoute = SavedRouteImport.update({
   path: '/saved',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSectionRoute = AdminSectionRouteImport.update({
+  id: '/$section',
+  path: '/$section',
+  getParentRoute: () => AdminRoute,
+} as any)
 const PropertiesSlugRoute = PropertiesSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
@@ -56,11 +74,14 @@ const PropertiesSlugRoute = PropertiesSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/saved': typeof SavedRoute
+  '/admin/$section': typeof AdminSectionRoute
   '/properties/$slug': typeof PropertiesSlugRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -69,28 +90,36 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/saved': typeof SavedRoute
+  '/admin/$section': typeof AdminSectionRoute
   '/properties/$slug': typeof PropertiesSlugRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/compare': typeof CompareRoute
   '/contact': typeof ContactRoute
   '/properties': typeof PropertiesRouteWithChildren
   '/saved': typeof SavedRoute
+  '/admin/$section': typeof AdminSectionRoute
   '/properties/$slug': typeof PropertiesSlugRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/compare'
     | '/contact'
     | '/properties'
     | '/saved'
+    | '/admin/$section'
     | '/properties/$slug'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -99,21 +128,27 @@ export interface FileRouteTypes {
     | '/contact'
     | '/properties'
     | '/saved'
+    | '/admin/$section'
     | '/properties/$slug'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
     | '/compare'
     | '/contact'
     | '/properties'
     | '/saved'
+    | '/admin/$section'
     | '/properties/$slug'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
   CompareRoute: typeof CompareRoute
   ContactRoute: typeof ContactRoute
   PropertiesRoute: typeof PropertiesRouteWithChildren
@@ -134,6 +169,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compare': {
@@ -164,6 +206,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SavedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/$section': {
+      id: '/admin/$section'
+      path: '/$section'
+      fullPath: '/admin/$section'
+      preLoaderRoute: typeof AdminSectionRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/properties/$slug': {
       id: '/properties/$slug'
       path: '/$slug'
@@ -173,6 +229,18 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AdminRouteChildren {
+  AdminSectionRoute: typeof AdminSectionRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminSectionRoute: AdminSectionRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface PropertiesRouteChildren {
   PropertiesSlugRoute: typeof PropertiesSlugRoute
@@ -189,6 +257,7 @@ const PropertiesRouteWithChildren = PropertiesRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
   CompareRoute: CompareRoute,
   ContactRoute: ContactRoute,
   PropertiesRoute: PropertiesRouteWithChildren,
